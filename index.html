@@ -1,57 +1,144 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Week Progress Tracker</title>
     <style>
         /* Import Google Font */
         @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap');
 
         body {
             font-family: 'Roboto', sans-serif;
-            background-color: #121212;
+            background: #201c1c; /* Changed to requested background color */
             color: #ffffff;
             margin: 0;
             padding: 20px;
         }
-        .week-info {
-            margin-bottom: 30px;
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .header .title {
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0;
+            padding: 0;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .header .subtitle {
+            font-size: 24px;
+            color: #bbbbbb;
+            margin-top: 10px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 40px 20px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(5px);
+            margin-bottom: 40px;
             text-align: center;
         }
+
         .week-number {
             font-size: 72px;
             font-weight: bold;
-            margin-bottom: 10px;
+            margin: 10px 0;
+            text-shadow: 0 3px 7px rgba(0,0,0,0.5);
         }
+
         .week-dates {
             font-size: 24px;
             color: #bbbbbb;
+            margin: 10px 0;
         }
+
+        .overall-dates {
+            font-size: 20px;
+            color: #aaaaaa;
+            margin: 10px 0;
+        }
+
+        .today-info {
+            font-size: 20px;
+            margin: 20px 0;
+            color: #cccccc;
+        }
+
         .progress-bar-container {
             width: 100%;
             background-color: #2c2c2c;
-            border-radius: 13px;
+            border-radius: 20px;
             overflow: hidden;
-            height: 30px;
-            margin-top: 20px;
+            height: 45px;
+            margin-top: 40px;
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+            transition: transform 0.2s ease;
         }
+
+        .progress-bar-container:hover {
+            transform: scale(1.01);
+        }
+
         .progress-bar {
             height: 100%;
             width: 0%;
-            background-color: #76c7c0;
+            background: linear-gradient(to right, #76c7c0, #4ca6a0);
             text-align: center;
-            line-height: 30px;
+            line-height: 45px;
             color: white;
             transition: width 0.5s;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            color: #999999;
+            font-size: 16px;
+        }
+
+        /* Add a slight fade-in animation for content */
+        .container, .header, .content-card, .footer {
+            animation: fadeIn 0.8s ease forwards;
+            opacity: 0;
+        }
+
+        @keyframes fadeIn {
+            to {opacity: 1;}
         }
     </style>
 </head>
 <body>
-<div class="week-info" id="weekInfo">
-    <div class="week-number" id="weekNumber">Week X</div>
-    <div class="week-dates" id="weekDates">Date Range</div>
-</div>
-<div class="progress-bar-container">
-    <div class="progress-bar" id="progressBar">0%</div>
+<div class="container">
+    <div class="header">
+        <div class="title">📅 12-Week Year Progress Tracker</div>
+        <div class="subtitle">Stay on track and achieve your goals! 🚀</div>
+    </div>
+
+    <div class="content-card">
+        <div class="week-number" id="weekNumber">Week X</div>
+        <div class="week-dates" id="weekDates">Date Range</div>
+        <div class="overall-dates" id="overallDates"></div>
+        <div class="today-info" id="todayInfo">Today is...</div>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progressBar">0%</div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Powered by your determination and a little bit of code! 🎉
+    </div>
 </div>
 
 <script>
@@ -63,7 +150,7 @@
     function getMonday(date) {
         const d = new Date(date);
         const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust if day is Sunday
         return new Date(d.setDate(diff));
     }
 
@@ -72,30 +159,51 @@
         return date.toLocaleDateString(undefined, options);
     }
 
+    function getWeekdayName(date) {
+        const weekdays = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+        return weekdays[date.getDay()];
+    }
+
     const weekNumberElem = document.getElementById('weekNumber');
     const weekDatesElem = document.getElementById('weekDates');
+    const overallDatesElem = document.getElementById('overallDates');
     const progressBarElem = document.getElementById('progressBar');
+    const todayInfoElem = document.getElementById('todayInfo');
     const startDateParam = getQueryParam('startDate');
 
     if (!startDateParam) {
         weekNumberElem.innerText = 'Please provide a startDate parameter in the URL in YYYY-MM-DD format.';
         weekDatesElem.innerText = '';
+        overallDatesElem.innerText = '';
+        todayInfoElem.innerText = '';
     } else {
         const startDate = new Date(startDateParam);
 
         if (isNaN(startDate)) {
             weekNumberElem.innerText = 'Invalid startDate format.';
             weekDatesElem.innerText = 'Please use YYYY-MM-DD.';
+            overallDatesElem.innerText = '';
+            todayInfoElem.innerText = '';
         } else {
+            const totalWeeks = 12;
+            const totalDays = totalWeeks * 7; // 84 days total
+            const endDate = new Date(startDate);
+            endDate.setDate(endDate.getDate() + (totalDays - 1)); // 84 days total
+
             // Get the Monday of the start week
             const startWeekMonday = getMonday(startDate);
-            // Get the Monday of the current week
+
+            // Get today's date
             const today = new Date();
+            // Get today's weekday
+            const todayWeekday = getWeekdayName(today);
+
+            // Get the Monday of the current week
             const currentWeekMonday = getMonday(today);
 
-            // Calculate the number of weeks between the two dates
-            const diffTime = currentWeekMonday - startWeekMonday;
-            let currentWeekNumber = Math.floor(diffTime / (7 * 24 * 60 * 60 * 1000)) + 1;
+            // Calculate how many full weeks have elapsed
+            const diffTimeWeeks = currentWeekMonday - startWeekMonday;
+            let currentWeekNumber = Math.floor(diffTimeWeeks / (7 * 24 * 60 * 60 * 1000)) + 1;
 
             if (currentWeekNumber < 1) currentWeekNumber = 1;
             if (currentWeekNumber > 12) currentWeekNumber = 12;
@@ -109,10 +217,21 @@
 
             // Display week information
             weekNumberElem.innerText = `Week ${currentWeekNumber}`;
-            weekDatesElem.innerText = `${formatDate(weekStartDate)} - ${formatDate(weekEndDate)}`;
+            weekDatesElem.innerHTML = `Current Week: ${formatDate(weekStartDate)} - ${formatDate(weekEndDate)} 🗓️`;
+            overallDatesElem.innerHTML = `Overall Cycle: ${formatDate(startDate)} - ${formatDate(endDate)} 🌱→🏆`;
 
-            // Calculate and display progress
-            let progressPercent = (currentWeekNumber / 12) * 100;
+            // Display today's weekday
+            todayInfoElem.innerText = `Today is ${todayWeekday} 🌞`;
+
+            // Calculate daily-level progress
+            const diffTimeFromStart = today - startDate; 
+            let progressPercent = 0;
+            if (diffTimeFromStart > 0) {
+                const daysPassed = diffTimeFromStart / (24 * 60 * 60 * 1000);
+                progressPercent = (daysPassed / totalDays) * 100;
+            }
+
+            if (progressPercent < 0) progressPercent = 0;
             if (progressPercent > 100) progressPercent = 100;
 
             progressBarElem.style.width = progressPercent + '%';
