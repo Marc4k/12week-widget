@@ -122,7 +122,6 @@
 <body>
 <div class="container">
     <div class="header">
-        <div class="title">📅 12-Week Year Progress Tracker</div>
         <div class="subtitle">Stay on track and achieve your goals! 🚀</div>
     </div>
 
@@ -136,9 +135,7 @@
         </div>
     </div>
 
-    <div class="footer">
-        Powered by your determination and a little bit of code! 🎉
-    </div>
+
 </div>
 
 <script>
@@ -217,7 +214,7 @@
 
             // Display week information
             weekNumberElem.innerText = `Week ${currentWeekNumber}`;
-            weekDatesElem.innerHTML = `Current Week: ${formatDate(weekStartDate)} - ${formatDate(weekEndDate)} 🗓️`;
+            weekDatesElem.innerHTML = `${formatDate(weekStartDate)} - ${formatDate(weekEndDate)} 🗓️`;
             overallDatesElem.innerHTML = `Overall Cycle: ${formatDate(startDate)} - ${formatDate(endDate)} 🌱→🏆`;
 
             // Display today's weekday
