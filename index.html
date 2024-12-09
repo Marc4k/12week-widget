@@ -7,52 +7,22 @@
 
         body {
             font-family: 'Roboto', sans-serif;
-            background: #201c1c;
+            background: #191919;
             color: #ffffff;
             margin: 0;
-            padding: 10px;
+            padding: 20px;
         }
 
         .container {
             max-width: 800px;
             margin: 0 auto;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .header .title {
-            font-size: 48px;
-            font-weight: bold;
-            margin: 0;
-            padding: 0;
-            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
-        }
-
-        .header .subtitle {
-            font-size: 24px;
-            color: #bbbbbb;
-            margin-top: 10px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.3);
-        }
-
-        .content-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 40px 20px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(5px);
-            margin-bottom: 40px;
             text-align: center;
         }
 
         .week-number {
             font-size: 72px;
             font-weight: bold;
-            margin: 10px 0;
-            text-shadow: 0 3px 7px rgba(0,0,0,0.5);
+            margin: 20px 0 10px;
         }
 
         .week-dates {
@@ -81,12 +51,6 @@
             height: 45px;
             margin-top: 40px;
             position: relative;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
-            transition: transform 0.2s ease;
-        }
-
-        .progress-bar-container:hover {
-            transform: scale(1.01);
         }
 
         .progress-bar {
@@ -101,39 +65,17 @@
             font-weight: bold;
         }
 
-        .footer {
-            text-align: center;
-            margin-top: 40px;
-            color: #999999;
-            font-size: 16px;
-        }
-
-        /* Add a slight fade-in animation for content */
-        .container, .header, .content-card, .footer {
-            animation: fadeIn 0.8s ease forwards;
-            opacity: 0;
-        }
-
-        @keyframes fadeIn {
-            to {opacity: 1;}
-        }
     </style>
 </head>
 <body>
 <div class="container">
-
-
-    <div class="content-card">
-        <div class="week-number" id="weekNumber">Week X</div>
-        <div class="week-dates" id="weekDates">Date Range</div>
-        <div class="overall-dates" id="overallDates"></div>
-        <div class="today-info" id="todayInfo">Today is...</div>
-        <div class="progress-bar-container">
-            <div class="progress-bar" id="progressBar">0%</div>
-        </div>
+    <div class="week-number" id="weekNumber">Week X</div>
+    <div class="week-dates" id="weekDates">Date Range</div>
+    <div class="overall-dates" id="overallDates"></div>
+    <div class="today-info" id="todayInfo">Today is...</div>
+    <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar">0%</div>
     </div>
-
-
 </div>
 
 <script>
@@ -145,7 +87,7 @@
     function getMonday(date) {
         const d = new Date(date);
         const day = d.getDay();
-        const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Adjust if day is Sunday
+        const diff = d.getDate() - day + (day === 0 ? -6 : 1);
         return new Date(d.setDate(diff));
     }
 
@@ -183,42 +125,31 @@
             const totalWeeks = 12;
             const totalDays = totalWeeks * 7; // 84 days total
             const endDate = new Date(startDate);
-            endDate.setDate(endDate.getDate() + (totalDays - 1)); // 84 days total
+            endDate.setDate(endDate.getDate() + (totalDays - 1)); 
 
-            // Get the Monday of the start week
             const startWeekMonday = getMonday(startDate);
 
-            // Get today's date
             const today = new Date();
-            // Get today's weekday
             const todayWeekday = getWeekdayName(today);
-
-            // Get the Monday of the current week
             const currentWeekMonday = getMonday(today);
 
-            // Calculate how many full weeks have elapsed
             const diffTimeWeeks = currentWeekMonday - startWeekMonday;
             let currentWeekNumber = Math.floor(diffTimeWeeks / (7 * 24 * 60 * 60 * 1000)) + 1;
 
             if (currentWeekNumber < 1) currentWeekNumber = 1;
             if (currentWeekNumber > 12) currentWeekNumber = 12;
 
-            // Calculate the start and end dates of the current week relative to startDate
             const weekStartDate = new Date(startWeekMonday);
             weekStartDate.setDate(weekStartDate.getDate() + (currentWeekNumber - 1) * 7);
 
             const weekEndDate = new Date(weekStartDate);
             weekEndDate.setDate(weekEndDate.getDate() + 6);
 
-            // Display week information
             weekNumberElem.innerText = `Week ${currentWeekNumber}`;
             weekDatesElem.innerHTML = `${formatDate(weekStartDate)} - ${formatDate(weekEndDate)} 🗓️`;
             overallDatesElem.innerHTML = `Overall Cycle: ${formatDate(startDate)} - ${formatDate(endDate)} 🌱→🏆`;
-
-            // Display today's weekday
             todayInfoElem.innerText = `Today is ${todayWeekday} 🌞`;
 
-            // Calculate daily-level progress
             const diffTimeFromStart = today - startDate; 
             let progressPercent = 0;
             if (diffTimeFromStart > 0) {
